@@ -1,0 +1,441 @@
+{
+  "name": "HR bot",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        1420
+      ],
+      "id": "86b03a2b-b1d3-450f-bb41-aa2cfb11baf6",
+      "name": "Telegram Trigger2",
+      "webhookId": "c42f7e61-7b5c-4239-9147-3296b17e2648",
+      "credentials": {
+        "telegramApi": {
+          "id": "n6kqXeITEUMkhpPY",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        1780
+      ],
+      "id": "a84e5306-8e1e-405f-ac25-3c7836a122fc",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "q": "subject:resume OR subject:cv has:attachment"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        1780
+      ],
+      "id": "747e4396-b0de-4af8-9a21-7cb72438bc46",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CE9JmkfPQ9Jf0MUO",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.choices[0].message.content || '';\nconst match = text.match(/финальная оценка.*?(\\d{1,2})/i);\nconst rating = match ? parseInt(match[1]) : null;\n\nreturn [{\n  json: {\n    rating,\n    analysis: text,\n    length: text.length,\n    email: $json.email || 'Не указано',\n    name: $json.name || 'Не указано',\n    pdfFileName: $json.pdfFileName || 'Без имени'\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2260,
+        1700
+      ],
+      "id": "053a44d5-1c56-46e1-818d-0395e8c17a08",
+      "name": "Response text"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const text = item.json.text || '';\n\n  const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}/);\n  const email = emailMatch ? emailMatch[0] : 'Не указано';\n\n  const nameMatch = text.match(/^([А-ЯЁ][а-яё]+)\\s+([А-ЯЁ][а-яё]+)/m);\n  const name = nameMatch ? `${nameMatch[1]} ${nameMatch[2]}` : 'Не указано';\n\n  return {\n    json: {\n      name,\n      email,\n      text\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        1700
+      ],
+      "id": "ae49e8f7-cb91-4766-943d-c5f9f4d9f37f",
+      "name": "Extract Text"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "body": "={{$json}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2020,
+        1700
+      ],
+      "id": "0f6b9fdc-1a39-4f9b-ad15-8f56684ca175",
+      "name": "Send to AI",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "hlW1faxxgt048fPq",
+          "name": "Hr bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "value": "20d74bc1716780c78f07f915b9a24330",
+          "mode": "id"
+        },
+        "title": "={{ $node[\"Extract Text\"].json[\"name\"] || \"Не указано\" }}\n\n",
+        "blockUi": {
+          "blockValues": [
+            {
+              "type": "heading_3",
+              "textContent": "={{ $json.analysis }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2760,
+        1560
+      ],
+      "id": "3206f0a7-fdf5-4311-aff9-6b972552f7b4",
+      "name": "NotionTrue",
+      "credentials": {
+        "notionApi": {
+          "id": "1GeVemu2OIOcHH7Y",
+          "name": "Notion account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c0afbc2f-8916-487a-818b-a1d799cd5ead",
+              "leftValue": "={{$json.analysis.length}}",
+              "rightValue": 2000,
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2480,
+        1700
+      ],
+      "id": "92a52b91-00e9-49a3-99a2-25af1e0ce5f6",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $input.all()[0].json.analysis || \"\";\nconst maxLen = 2000;\nconst chunks = [];\nlet idx = 0;\n\nwhile (idx < text.length) {\n  let sub = text.slice(idx, idx + maxLen);\n  const lastSpace = sub.lastIndexOf(\" \");\n  \n  if (lastSpace > maxLen * 0.5) {\n    sub = sub.slice(0, lastSpace);\n    idx += lastSpace + 1;\n  } else {\n    idx += maxLen;\n  }\n  \n  chunks.push(sub);\n}\n\nreturn chunks.map((chunk, i) => ({\n  json: {\n    pdfFileName: $input.all()[0].json.pdfFileName,\n    email: $input.all()[0].json.email,\n    rating: $input.all()[0].json.rating,\n    textChunk: chunk,\n    isFirst: i === 0\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2760,
+        1820
+      ],
+      "id": "c797daa9-b288-4630-8eee-cdc781bf56d5",
+      "name": "Chunk"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const { text } = item.json;\n\n  const prompt = `Ты — AI-рекрутер. Ниже приведено резюме кандидата. \nПроанализируй его текст и:\n\n1. Укажи имя кандидата.\n2. Напиши краткий, конструктивный и доброжелательный анализ кандидата на русском языке (2–3 предложения). Отметь сильные стороны.\n3. Дай общую оценку от 1 до 10, ориентируясь на senior-разработчика. Если информации не хватает — укажи, что её нужно добавить, но оцени вежливо.\n4. Укажи email кандидата.\n5. Верни ответ в четкой структуре: Имя / Анализ / Оценка / Email\n\n=== Резюме кандидата ===\n\n${text}\n`;\n\n  return {\n    json: {\n      model: \"mistralai/mistral-7b-instruct:free\",\n      messages: [\n        {\n          role: \"system\",\n          content: \"Ты — опытный AI-рекрутер, пишешь вежливо, позитивно и профессионально.\"\n        },\n        {\n          role: \"user\",\n          content: prompt\n        }\n      ]\n    }\n  };\n});\n"
+      },
+      "name": "Prepare Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1780,
+        1700
+      ],
+      "id": "77e35ef9-84cd-434d-a3e7-43a7b7fb4649"
+    },
+    {
+      "parameters": {
+        "resource": "file",
+        "fileId": "={{$json.message.document.file_id}}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        1620
+      ],
+      "id": "06f1dbb8-e5b8-4acc-aa85-3eb00fe6ac34",
+      "name": "Telegram",
+      "webhookId": "bd086a55-70e8-4305-981b-f688b7fbc6cd",
+      "credentials": {
+        "telegramApi": {
+          "id": "n6kqXeITEUMkhpPY",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1320,
+        1620
+      ],
+      "id": "b371d8af-5d0e-49d6-af6b-a7a7fc0eee1f",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "pageId": {
+          "__rl": true,
+          "value": "20d74bc1716780c78f07f915b9a24330",
+          "mode": "id"
+        },
+        "title": "={{ $json.textChunk }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        2940,
+        1820
+      ],
+      "id": "95ee37db-fc2a-4965-8ec3-68644673d628",
+      "name": "Create page",
+      "credentials": {
+        "notionApi": {
+          "id": "1GeVemu2OIOcHH7Y",
+          "name": "Notion account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Extract Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Response text": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Text": {
+      "main": [
+        [
+          {
+            "node": "Prepare Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to AI": {
+      "main": [
+        [
+          {
+            "node": "Response text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "NotionTrue": {
+      "main": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "NotionTrue",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Chunk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chunk": {
+      "main": [
+        [
+          {
+            "node": "Create page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Prompt": {
+      "main": [
+        [
+          {
+            "node": "Send to AI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger2": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Extract Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create page": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "488128bb-f200-423e-b29a-3d9d47e733b0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d488a8043ab3e0416f6f989e983a31cdee3956c92eaa78f4470df6b3bb8d093a"
+  },
+  "id": "cVdSZj8KhBXwl5Xf",
+  "tags": []
+}
