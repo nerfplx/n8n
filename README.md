@@ -7,5 +7,5 @@
 <img src="https://github.com/user-attachments/assets/5abf26a8-200c-4ae5-af78-81b8145bcced" width="400" />
 
 # n8n-Ai-catalog
-Этот бот автоматизирует процесс создания описаний товаров на основе изображений, которые появляются в определённой папке Google Drive
-<img src="https://github.com/user-attachments/assets/f91c8edc-e9a2-48d6-9304-0ca8e0885199" width="400" />
+Этот бот автоматизирует процесс создания описаний товаров на основе изображений
+<img src="https://github.com/user-attachments/assets/5b7efee4-912f-441f-aa68-4a97cab18fbb" width="400" />
