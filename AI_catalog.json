@@ -1,0 +1,197 @@
+{
+  "name": "AI catalog",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 1,
+      "position": [
+        -2200,
+        1500
+      ],
+      "id": "1f0dece5-e121-4d6d-9d16-a33b37aa89ea",
+      "name": "Download Image",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GOOGLE_DRIVE_OAUTH2_CREDENTIALS_ID",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_OPENROUTER_API_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"deepseek/deepseek-chat-v3-0324:free\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"Ты эксперт по созданию описаний товаров для маркетплейсов. На основе изображения товара создай привлекательное описание. Включи: название товара, ключевые характеристики, преимущества, размеры (если видны), материалы (если определимы), цвета. Пиши кратко но информативно, используй эмодзи для привлекательности.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Создай описание товара для маркетплейса на основе этого изображения:\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:{{ $binary.data.mimeType }};base64,{{ $binary.data }}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"max_tokens\": 1000,\n  \"temperature\": 0.7\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1940,
+        1600
+      ],
+      "id": "21ac3974-d850-40d5-9574-8d2f0f1d5840",
+      "name": "Send to AI Vision"
+    },
+    {
+      "parameters": {
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "text": "=\n📄 {{ $('Download Image').item.json.name }}\n\n🛍️ **Описание для маркетплейса:**\n{{ $json.choices[0].message.content }}\n",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1,
+      "position": [
+        -1700,
+        1600
+      ],
+      "id": "eeb71095-4d63-4c9e-8a18-67dc48a0b368",
+      "name": "Send Description to Telegram",
+      "webhookId": "WEBHOOK_ID_PLACEHOLDER",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_API_CREDENTIALS_ID",
+          "name": "ai catalog"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyHour"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "GOOGLE_DRIVE_FOLDER_ID",
+          "mode": "list",
+          "cachedResultName": "Ai catalog",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/GOOGLE_DRIVE_FOLDER_ID"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2460,
+        1500
+      ],
+      "id": "d4a80280-98cb-47b4-8d4e-7e8ce87c8c6e",
+      "name": "Google Drive Trigger1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "GOOGLE_DRIVE_OAUTH2_CREDENTIALS_ID",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "YOUR_TELEGRAM_CHAT_ID",
+        "binaryData": true,
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1940,
+        1360
+      ],
+      "id": "26cf51c1-8958-48ee-a68a-2cb17fb05500",
+      "name": "Telegram",
+      "webhookId": "ANOTHER_WEBHOOK_ID_PLACEHOLDER",
+      "credentials": {
+        "telegramApi": {
+          "id": "TELEGRAM_API_CREDENTIALS_ID",
+          "name": "ai catalog"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download Image": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send to AI Vision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to AI Vision": {
+      "main": [
+        [
+          {
+            "node": "Send Description to Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Download Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "15b2e379-ebd5-4040-b584-0c01f986bb3b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "INSTANCE_ID_PLACEHOLDER"
+  },
+  "id": "Sy9tO806DVloxMb3",
+  "tags": []
+}
