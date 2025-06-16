@@ -4,4 +4,8 @@
 
 # n8n-Twitter-digest
 Этот бот автоматически собирает главные темы дня и отправляет результат в телеграм
-<img src="https://github.com/user-attachments/assets/68969912-f284-491c-8896-86ab8c6e76b4" width="400" />
+<img src="https://github.com/user-attachments/assets/5abf26a8-200c-4ae5-af78-81b8145bcced" width="400" />
+
+# n8n-Ai-catalog
+Этот бот автоматизирует процесс создания описаний товаров на основе изображений, которые появляются в определённой папке Google Drive
+<img src="https://github.com/user-attachments/assets/f91c8edc-e9a2-48d6-9304-0ca8e0885199" width="400" />
