@@ -1,0 +1,540 @@
+{
+  "name": "Twitter digest",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        1860,
+        580
+      ],
+      "id": "5e7de764-af8e-4d6c-84e5-fedccd5e2b3c",
+      "name": "When chat message received",
+      "webhookId": "f6120d26-6f63-4ae8-9f91-0a401e26cd6d"
+    },
+    {
+      "parameters": {
+        "resource": "extraction",
+        "operation": "query",
+        "sessionId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Session_ID', ``, 'string') }}",
+        "windowId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Window_ID', ``, 'string') }}",
+        "prompt": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Prompt', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "id": "db967d31-ce2c-4d73-8fd7-38c081fae0d1",
+      "name": "Query",
+      "type": "n8n-nodes-base.airtopTool",
+      "position": [
+        2200,
+        840
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "airtopApi": {
+          "id": "Q2EIIXf4bpL1AFF7",
+          "name": "BrowserAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "window",
+        "operation": "load",
+        "sessionId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Session_ID', ``, 'string') }}",
+        "windowId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Window_ID', ``, 'string') }}",
+        "url": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('URL', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "id": "b026c92d-6bb1-4b2d-9026-f817c22c0a97",
+      "name": "Load URL",
+      "type": "n8n-nodes-base.airtopTool",
+      "position": [
+        2320,
+        840
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "airtopApi": {
+          "id": "Q2EIIXf4bpL1AFF7",
+          "name": "BrowserAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "interaction",
+        "operation": "type",
+        "sessionId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Session_ID', ``, 'string') }}",
+        "windowId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Window_ID', ``, 'string') }}",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "pressEnterKey": true,
+        "elementDescription": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Element_Description', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "id": "0e54b550-4df1-4cf6-8c84-ebaf5e88faea",
+      "name": "Type",
+      "type": "n8n-nodes-base.airtopTool",
+      "position": [
+        2080,
+        840
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtopApi": {
+          "id": "Q2EIIXf4bpL1AFF7",
+          "name": "BrowserAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "profileName": "={{ $json.profile_name }}",
+        "additionalFields": {}
+      },
+      "id": "a3d95dde-3cf6-49f5-b9e6-0c7eb70b7b42",
+      "name": "Session",
+      "type": "n8n-nodes-base.airtop",
+      "position": [
+        1860,
+        1060
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "airtopApi": {
+          "id": "Q2EIIXf4bpL1AFF7",
+          "name": "BrowserAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "window",
+        "url": "={{ $('When Executed by Another Workflow').item.json.url }}",
+        "getLiveView": true,
+        "additionalFields": {}
+      },
+      "id": "e0fb3a7c-206d-4611-897b-32a7a729415c",
+      "name": "Window",
+      "type": "n8n-nodes-base.airtop",
+      "position": [
+        2040,
+        1060
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "airtopApi": {
+          "id": "Q2EIIXf4bpL1AFF7",
+          "name": "BrowserAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0a0680af-39bd-4bc7-b9cd-84c1766c79a1",
+              "name": "sessionId",
+              "type": "string",
+              "value": "={{ $('Session').item.json.sessionId }}"
+            },
+            {
+              "id": "13940ee8-c1d4-4718-a7b4-176c44c097b7",
+              "name": "windowId",
+              "type": "string",
+              "value": "={{ $('Window').item.json.data.windowId }}"
+            },
+            {
+              "id": "a0f2005c-2cd2-4a8d-891b-a4759b72a124",
+              "name": "output",
+              "type": "string",
+              "value": "Session and window created successfully"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "88cb7841-52cd-45b2-a4e1-a4e90a839702",
+      "name": "Return IDs",
+      "type": "n8n-nodes-base.set",
+      "position": [
+        2400,
+        1060
+      ],
+      "typeVersion": 3.4
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "url"
+            },
+            {
+              "name": "profile_name"
+            }
+          ]
+        }
+      },
+      "id": "271d6203-f56e-408b-a1ca-9304bb7678ed",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        1680,
+        1060
+      ],
+      "typeVersion": 1.1
+    },
+    {
+      "parameters": {
+        "name": "Start_Browser",
+        "workflowId": {
+          "__rl": true,
+          "value": "vbWbPLIALaa2VNq4",
+          "mode": "id"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "url": "https://x.com/",
+            "profile_name": "__PROFILE_NAME__"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "profile_name",
+              "displayName": "profile_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "id": "4f9a498f-3166-4cc6-8dec-45411a57f9bb",
+      "name": "Start Browser",
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "position": [
+        1820,
+        840
+      ],
+      "typeVersion": 2.1
+    },
+    {
+      "parameters": {
+        "operation": "terminate",
+        "sessionId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Session_ID', ``, 'string') }}"
+      },
+      "id": "4d058c00-4e7b-4e03-8d20-3b0e9f640e05",
+      "name": "End Session",
+      "type": "n8n-nodes-base.airtopTool",
+      "position": [
+        2440,
+        840
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "airtopApi": {
+          "id": "Q2EIIXf4bpL1AFF7",
+          "name": "BrowserAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=# Overview\nВы — умный, продвинутый веб-агент, подключённый к инструментам, которые позволяют управлять удалённым веб-браузером. Ваша основная цель — точно и эффективно выполнять запросы пользователя, взаимодействуя с веб-страницами с помощью доступных инструментов.\n\n## Tools\n\nStart_Browser\nВсегда начинайте с этого инструмента.\n\nОн возвращает sessionId и windowId, которые необходимы для всех последующих действий.\n\nВы должны указывать эти ID при каждом использовании других инструментов.\n\n### Load URL\nЗагружает веб-сайт в окне браузера.\n\nУкажите sessionId, windowId и нужный URL (например, \"https://www.x.com\").\n\n### Query\nУ вас нет доступа к экрану браузера, но вы можете использовать этот инструмент для получения информации и подсказок о текущем окне браузера.\n\nИспользуйте его, чтобы получить данные, которые запрашивает пользователь.\n\n### Click\nИспользуется для нажатия на элементы, такие как кнопки.\n\n### Type\nИспользуется для ввода текста в видимые поля ввода. Этот инструмент автоматически нажимает Enter после ввода текста, поэтому не нужно указывать [ENTER] отдельно.\n\n### End Session\nКогда задача полностью завершена, используйте этот инструмент, чтобы корректно закрыть сессию браузера.\n\nВЫ ВСЕГДА ДОЛЖНЫ ИСПОЛЬЗОВАТЬ ЭТОТ ИНСТРУМЕНТ ПЕРЕД ТЕМ, КАК ОТВЕТИТЬ ПОЛЬЗОВАТЕЛЮ.\n\n### Think\nИспользуйте, когда нужно проанализировать выполненные действия и обдумать следующие шаги.\n\n## Важно\nВсегда действуйте пошагово. Используйте Query, если не уверены, что отображается на экране или что нужно нажимать/вводить дальше.\n\nВам НИКОГДА не нужно выполнять вход в систему.",
+          "maxIterations": 20,
+          "returnIntermediateSteps": false,
+          "passthroughBinaryImages": true
+        }
+      },
+      "id": "1702b335-dc10-481e-948b-fb442d5de1e1",
+      "name": "Browser Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        2060,
+        580
+      ],
+      "retryOnFail": true,
+      "typeVersion": 1.8,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1660,
+        600
+      ],
+      "id": "79bf8c3c-7e1d-4b56-8cf4-21a4052c7938",
+      "name": "Memory"
+    },
+    {
+      "parameters": {
+        "resource": "interaction",
+        "sessionId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Session_ID', ``, 'string') }}",
+        "windowId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Window_ID', ``, 'string') }}",
+        "elementDescription": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Element_Description', ``, 'string') }}",
+        "additionalFields": {
+          "waitForNavigation": "domcontentloaded"
+        }
+      },
+      "id": "c18364bc-655d-41b9-985e-1d42b0074886",
+      "name": "ClickTool",
+      "type": "n8n-nodes-base.airtopTool",
+      "position": [
+        1960,
+        840
+      ],
+      "typeVersion": 1,
+      "alwaysOutputData": true,
+      "credentials": {
+        "airtopApi": {
+          "id": "Q2EIIXf4bpL1AFF7",
+          "name": "BrowserAI"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "__CHAT_ID__",
+        "text": "={{ $json.data.liveViewUrl }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2220,
+        1060
+      ],
+      "id": "733911b6-9698-4957-b5dc-01affe8bbbbf",
+      "name": "Telegram1",
+      "webhookId": "69f6e696-23e0-4c83-a865-0cfefa07dbf0",
+      "credentials": {
+        "telegramApi": {
+          "id": "b0eiS8nj0U3nK2qr",
+          "name": "twit_digest"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3-0324:free",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1560,
+        600
+      ],
+      "id": "f300016c-a2b6-44c2-ab7d-6c3931bb105d",
+      "name": "AI model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "sIBQC1kKEFbzGCIQ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        1620,
+        840
+      ],
+      "id": "f602e180-d53b-46dc-a6fd-2b81505be4f0",
+      "name": "Think"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Type": {
+      "ai_tool": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query": {
+      "ai_tool": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Session": {
+      "main": [
+        [
+          {
+            "node": "Window",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load URL": {
+      "ai_tool": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Session",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Browser": {
+      "ai_tool": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "End Session": {
+      "ai_tool": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram1": {
+      "main": [
+        [
+          {
+            "node": "Return IDs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ClickTool": {
+      "ai_tool": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "Browser Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d6ee9a37-1ca8-440c-ac5e-4b03874e777a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d488a8043ab3e0416f6f989e983a31cdee3956c92eaa78f4470df6b3bb8d093a"
+  },
+  "id": "vbWbPLIALaa2VNq4",
+  "tags": []
+}
