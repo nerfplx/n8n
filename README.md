@@ -4,6 +4,7 @@
 
 # n8n-Twitter-digest
 Этот бот по запросу собирает информацию в твиттере через airtop (универсальный бот, легко можно переделать под любой сайт)
+
 <img src="https://github.com/user-attachments/assets/1e5cf49a-0b7a-4b84-80a5-d2bd37f1340e" width="400" />
 
 # n8n-Ai-catalog
